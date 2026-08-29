@@ -1,0 +1,66 @@
+FICHERO DE ESTUDIO - App de escritorio para Windows 11
+=========================================================
+
+Esta app se abre en una ventana nativa (sin barra de direcciones ni
+pestañas de navegador). Tenés dos formas de usarla:
+
+  A) Correrla con Python instalado (mas simple, dos clics).
+  B) Generar un .exe independiente, que corre en cualquier PC con
+     Windows 11 sin necesitar Python instalado.
+
+REQUISITO ÚNICO (para ambas opciones): tener Python instalado
+(descargalo de python.org y, durante la instalacion, tildar la
+casilla "Add Python to PATH").
+
+ARCHIVOS QUE TIENEN QUE ESTAR JUNTOS EN LA MISMA CARPETA
+-----------------------------------------------------------
+app.py, index.html, requirements.txt, 1-instalar.bat,
+2-abrir-app.bat, 3-crear-exe.bat, LEEME.txt
+
+
+OPCIÓN A: usarla con Python (rapido)
+--------------------------------------
+1. Doble clic en "1-instalar.bat" (instala pywebview, una sola vez,
+   necesita internet).
+2. Doble clic en "2-abrir-app.bat" para abrir la app.
+
+Despues de la primera vez, solo hace falta "2-abrir-app.bat".
+
+
+OPCIÓN B: generar un .exe independiente (recomendado si vas a
+compartir la app o usarla sin Python)
+-----------------------------------------------------------------
+1. Doble clic en "3-crear-exe.bat".
+   - Necesita internet SOLO esta vez, para descargar pyinstaller.
+   - Tarda 1-2 minutos.
+2. Cuando termina, se abre sola la carpeta "dist" con el archivo
+   FicheroDeEstudio.exe adentro.
+3. Ese .exe ya es independiente: podes copiarlo a otra carpeta, a un
+   pendrive, o mandarlo a otra PC con Windows 11, y va a funcionar
+   con doble clic, sin instalar nada mas.
+
+Nota: la primera vez que abras el .exe puede tardar unos segundos
+de mas en arrancar (es normal, esta descomprimiendose).
+
+
+TUS DATOS
+----------
+Tus mazos y tarjetas quedan guardados en la PC entre una sesion y
+otra. No hace falta internet para usar la app (solo para instalar
+pywebview/pyinstaller la primera vez).
+
+
+SI ALGO NO FUNCIONA (pantalla vacía, botones que no responden)
+-----------------------------------------------------------------
+1. Primero probá abrir "index.html" con doble clic (se abre en tu
+   navegador normal). Si ahí funciona todo bien, el problema es
+   puntual de la ventana de escritorio, no de la app en sí.
+2. Para ver el error exacto en la ventana de escritorio: abrí
+   "app.py" con el Bloc de notas, y en las últimas líneas comentá
+   (poniendo # adelante) la línea "webview.start(private_mode=False)"
+   y descomentá (sacando el #) la línea de arriba que dice
+   "debug=True". Volvé a abrir con "2-abrir-app.bat": se va a abrir
+   una ventana con herramientas de desarrollador donde la pestaña
+   "Console" muestra el error en rojo.
+3. Si generaste el .exe y no abre, probá el mismo truco pero
+   generando de nuevo el .exe despues de editar app.py (paso 3-crear-exe.bat).

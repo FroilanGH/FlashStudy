@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fichero — Flashcards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>Fichero <span>de estudio</span></h1>
+    <div class="subtitle">Mazos de flashcards, tareas y fechas importantes, todo en un solo lugar</div>
+    <div class="main-nav">
+      <button type="button" class="nav-btn active" data-view="fichero">Fichero</button>
+      <button type="button" class="nav-btn" data-view="tareas">Tareas</button>
+      <button type="button" class="nav-btn" data-view="calendario">Calendario</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ VISTA: FICHERO (flashcards) ============ -->
+<div id="viewFichero">
+  <div class="folder-tabs" id="folderTabs"></div>
+  <div class="deck-tabs-row">
+    <button type="button" class="deck-page-btn" id="deckPrevBtn" aria-label="Mazos anteriores">&#8249;</button>
+    <div class="deck-tabs" id="deckTabs"></div>
+    <button type="button" class="deck-page-btn" id="deckNextBtn" aria-label="Más mazos">&#8250;</button>
+    <span class="deck-page-label" id="deckPageLabel"></span>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <button class="btn btn-outline" id="exportDeckBtn">&#8681; Exportar mazo</button>
+      <button class="btn btn-outline" id="exportAllBtn">&#8681; Exportar todo</button>
+      <button class="btn btn-outline" id="importBtn">&#8679; Importar</button>
+    </div>
+    <div class="toolbar-right">
+      <button class="btn btn-tertiary" id="pomoBtn">&#9201; Pomodoro</button>
+      <button class="btn btn-secondary" id="presentBtn">&#9654; Presentar</button>
+      <button class="btn btn-primary" id="openModalBtn">+ Nueva tarjeta</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="grid" id="grid"></div>
+  </main>
+</div>
+
+<!-- ============ VISTA: TAREAS ============ -->
+<div id="viewTareas" hidden>
+  <div class="view-main">
+    <div class="tasks-toolbar">
+      <button class="btn btn-primary" id="taskAddBtn">+ Nueva tarea</button>
+    </div>
+
+    <div class="tasks-group">
+      <h3 class="tasks-heading">Pendientes</h3>
+      <ul class="tasks-list" id="pendingTasksList"></ul>
+      <div class="empty-state small" id="pendingEmpty" hidden>No tenés tareas pendientes.</div>
+    </div>
+
+    <div class="tasks-group">
+      <h3 class="tasks-heading">Completadas</h3>
+      <ul class="tasks-list" id="doneTasksList"></ul>
+      <div class="empty-state small" id="doneEmpty" hidden>Todavía no completaste ninguna tarea.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VISTA: CALENDARIO ============ -->
+<div id="viewCalendario" hidden>
+  <div class="view-main">
+    <div class="calendar-layout">
+      <div class="calendar-card">
+        <div class="calendar-nav">
+          <button type="button" id="calPrevBtn" aria-label="Mes anterior">&#8592;</button>
+          <div class="calendar-month-label" id="calMonthLabel"></div>
+          <button type="button" id="calNextBtn" aria-label="Mes siguiente">&#8594;</button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span>
+        </div>
+        <div class="calendar-grid" id="calGrid"></div>
+      </div>
+      <div class="calendar-upcoming">
+        <h3 class="tasks-heading">Próximos eventos</h3>
+        <ul class="upcoming-list" id="upcomingList"></ul>
+        <div class="empty-state small" id="upcomingEmpty" hidden>No tenés fechas anotadas todavía. Hacé clic en un día del calendario para agregar una.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: nueva tarjeta -->
+<div class="overlay" id="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">Nueva tarjeta</h2>
+    <form id="cardForm">
+      <div class="field">
+        <label for="qInput">Pregunta</label>
+        <textarea id="qInput" required></textarea>
+      </div>
+      <div class="field">
+        <label for="aInput">Respuesta</label>
+        <textarea id="aInput" required></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancelBtn">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="cardSubmitBtn">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: nuevo mazo -->
+<div class="overlay" id="deckOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deckModalTitle">
+    <h2 id="deckModalTitle">Nuevo mazo</h2>
+    <form id="deckForm">
+      <div class="field">
+        <label for="deckNameInput">Nombre del mazo</label>
+        <input type="text" id="deckNameInput" required placeholder="Historia, Música...">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="deckCancelBtn">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="deckCreateBtn">Crear</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: nueva carpeta -->
+<div class="overlay" id="folderOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="folderModalTitle">
+    <h2 id="folderModalTitle">Nueva carpeta</h2>
+    <form id="folderForm">
+      <div class="field">
+        <label for="folderNameInput">Nombre de la carpeta</label>
+        <input type="text" id="folderNameInput" required placeholder="Facultad, Idiomas...">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="folderCancelBtn">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="folderCreateBtn">Crear</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: mover mazo a carpeta -->
+<div class="overlay" id="moveDeckOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="moveDeckModalTitle">
+    <h2 id="moveDeckModalTitle">Mover mazo</h2>
+    <div id="moveDeckOptions"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="moveDeckCloseBtn">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: nueva tarea / editar tarea -->
+<div class="overlay" id="taskOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
+    <h2 id="taskModalTitle">Nueva tarea</h2>
+    <div class="field">
+      <label for="taskTitleInput">Título</label>
+      <input type="text" id="taskTitleInput" placeholder="Ej: Entregar TP de Historia">
+    </div>
+    <div class="field">
+      <label for="taskDescInput">Descripción (opcional)</label>
+      <textarea id="taskDescInput" rows="3" placeholder="Detalles, requisitos..."></textarea>
+    </div>
+    <div class="field">
+      <label for="taskDateInput">Fecha de entrega (opcional)</label>
+      <input type="date" id="taskDateInput">
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="taskCancelBtn">Cancelar</button>
+      <button type="button" class="btn btn-primary" id="taskSaveBtn">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: confirmar -->
+<div class="overlay" id="confirmOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <h2 id="confirmTitle">Confirmar</h2>
+    <p class="modal-hint" id="confirmMessage" style="margin-top:-8px;"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="confirmCancelBtn">Cancelar</button>
+      <button type="button" class="btn btn-primary" id="confirmOkBtn">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: exportar -->
+<div class="overlay" id="exportOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle">
+    <h2 id="exportModalTitle">Exportar</h2>
+    <p class="modal-hint">Copiá este texto y pegalo en un archivo nuevo con extensión .json (por ejemplo con el Bloc de notas), o probá "Descargar archivo" si tu navegador lo permite.</p>
+    <div class="field">
+      <textarea id="exportTextarea" rows="10" readonly></textarea>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="exportCloseBtn">Cerrar</button>
+      <button type="button" class="btn btn-outline" id="exportDownloadBtn">Descargar archivo</button>
+      <button type="button" class="btn btn-primary" id="exportCopyBtn">Copiar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: importar -->
+<div class="overlay" id="importOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="importModalTitle">
+    <h2 id="importModalTitle">Importar</h2>
+    <p class="modal-hint">Elegí un archivo .json exportado desde Fichero, o pegá el contenido directamente.</p>
+    <div class="modal-actions left">
+      <button type="button" class="btn btn-outline" id="importFileBtn">Elegir archivo...</button>
+      <input type="file" id="importFileInput" accept=".json,application/json" hidden>
+    </div>
+    <div class="field">
+      <label for="importTextarea">Contenido JSON</label>
+      <textarea id="importTextarea" rows="8" placeholder='Pegá acá el contenido del archivo .json'></textarea>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="importCancelBtn">Cancelar</button>
+      <button type="button" class="btn btn-primary" id="importTextBtn">Importar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: pomodoro -->
+<div class="overlay" id="pomoOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pomoModalTitle">
+    <h2 id="pomoModalTitle">Pomodoro</h2>
+    <div id="pomoPresets"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="pomoCancelBtn">Cancelar</button>
+      <button type="button" class="btn btn-tertiary" id="pomoStartBtn">Iniciar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: evento del calendario -->
+<div class="overlay" id="dayOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dayModalTitle">
+    <h2 id="dayModalTitle">Fecha</h2>
+    <ul class="upcoming-list" id="dayEventsList" style="margin:0 0 16px;"></ul>
+    <div class="field">
+      <label for="dayEventInput">Nuevo evento (examen, entrega...)</label>
+      <input type="text" id="dayEventInput" placeholder="Ej: Examen de Historia">
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="dayCloseBtn">Cerrar</button>
+      <button type="button" class="btn btn-primary" id="dayAddEventBtn">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Widget flotante del pomodoro -->
+<div class="pomo-widget" id="pomoWidget" hidden>
+  <button class="pomo-close" id="pomoStopBtn" aria-label="Detener pomodoro">&times;</button>
+  <div class="pomo-phase" id="pomoPhaseEl">Estudio</div>
+  <div class="pomo-time" id="pomoTimeEl">30:00</div>
+  <div class="pomo-bar"><div class="pomo-bar-fill" id="pomoBarFill"></div></div>
+  <div class="pomo-controls">
+    <button type="button" id="pomoPauseBtn">Pausar</button>
+    <button type="button" id="pomoResetBtn">Reiniciar</button>
+  </div>
+</div>
+
+<!-- Modo presentación -->
+<div class="present-overlay" id="presentOverlay" hidden>
+  <button class="present-exit" id="presentExitBtn" aria-label="Salir de la presentación">&times;</button>
+  <div class="present-progress" id="presentProgress"></div>
+
+  <div class="present-card-slot" id="presentCardSlot">
+    <div class="card" id="presentCard" tabindex="0" role="button" aria-label="Tarjeta, clic para dar vuelta">
+      <div class="card-inner">
+        <div class="face face-front">
+          <div class="face-label">Pregunta</div>
+          <div class="face-text" id="presentFrontText"></div>
+          <div class="face-hint">clic para ver la respuesta</div>
+        </div>
+        <div class="face face-back">
+          <div class="face-label">Respuesta</div>
+          <div class="face-text" id="presentBackText"></div>
+          <div class="face-hint">clic para continuar</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="present-kbd-hint" id="presentKbdHint">Espacio: dar vuelta / avanzar &nbsp;·&nbsp; &#8592; anterior &nbsp;·&nbsp; Esc: salir</div>
+
+  <div class="present-end" id="presentEnd" hidden>
+    <h2>Repasaste todo el mazo</h2>
+    <div>
+      <button class="btn btn-primary" id="presentRestartBtn">Reiniciar</button>
+      <button class="btn btn-ghost" id="presentExitBtn2">Salir</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
