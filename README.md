@@ -4,7 +4,7 @@ Una app de flashcards, tareas y calendario pensada para estudiar sin depender
 de ninguna cuenta, servidor ni conexión a internet. Todo vive en el
 navegador (o en una ventana de escritorio nativa, a elección).
 
-**[▶ Ver demo en vivo](#)** _(reemplazá este link por tu URL de GitHub Pages / Vercel una vez publicado)_
+**[▶ Ver demo en vivo](#)** _(https://froilangh.github.io/FlashStudy/)_
 
 ![Vista del mazo con tarjetas](screenshots/mazo-con-tarjetas.png)
 
